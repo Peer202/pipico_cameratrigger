@@ -50,32 +50,8 @@ Impulsecounter* stroboCounter;
 
 uint16_t countercompare = 100;
 
-
-void setupCounter(){
-  slice_num = pwm_gpio_to_slice_num(stroboPin);
-
-  gpio_set_function(KtwoPin,GPIO_FUNC_PWM);
-  gpio_set_function(stroboPin,GPIO_FUNC_PWM);
-
-  pwm_config cfg = pwm_get_default_config();
-  pwm_config_set_clkdiv_mode(&cfg,PWM_DIV_B_RISING);
-  pwm_config_set_clkdiv(&cfg,1);
-  pwm_config_set_phase_correct(&cfg,false);
-  pwm_config_set_wrap(&cfg,10000); // set to value the counter will never reach to prevent overwrap
-  pwm_init(slice_num,&cfg,false);
-
-  pwm_set_chan_level(slice_num, PWM_CHAN_A, 1000); // value
-  pwm_set_counter(slice_num,0);
-
-  pwm_set_enabled(slice_num,true);
-  Serial1.println(String(slice_num));
-
-
-};
-
 void onFullRot(){
   digitalWrite(statusLEDPin,interLED);
-  //pwm_set_counter(1,0); // reset the counter to count again
   stroboCounter->resetCounter();
   interLED = !interLED;
   countercompare = (uint16_t) countercompare + 100;
@@ -99,7 +75,8 @@ void setup() {
   Serial1.println("Startup");
   stroboCounter = new Impulsecounter(KtwoPin,stroboPin,300);
   addInterrupt();
-  //setupCounter();
+
+
 
 }
 
