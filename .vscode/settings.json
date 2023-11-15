@@ -45,5 +45,6 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/data/OneDrive_linux/Dokumente/Schiffbau/Bachelorarbeit/Versuchsaufbau Verformung/Arduino/pipico_CameraTrigger/.pio/libdeps/pico/Unity"
 }

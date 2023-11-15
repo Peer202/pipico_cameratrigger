@@ -3,49 +3,51 @@
 #include <Arduino.h>
 #include "counter.h"
 
-static void onIrqWrap(){
-    pwm_clear_irq(1); // Temporary
-    Serial1.print("IRQ Overflow");
-};
 
-Impulsecounter::Impulsecounter(int pinNumber,uint16_t counterOverflowValue){
-    nCounterPin = pinNumber;
-    nPwnSlice = pwm_gpio_to_slice_num(nCounterPin);
-    counterOverflowValue = (uint16_t) counterOverflowValue * 2;
+Impulsecounter::Impulsecounter(int triggerPinNumber,int outputPinNumber, uint16_t counterCompare){
+    /*
+        Constructor for the Counter Class
+        Initializes the Counter, but wont start it.
+    */
+    this->triggerPinNumber = triggerPinNumber;
+    this->outputPinNumber = outputPinNumber; 
+    this->nPwmSlice = pwm_gpio_to_slice_num(this->triggerPinNumber);
+    this->counterCompare = counterCompare;
 
-    // Tell GPIO they are allocated to the PWM
-    gpio_set_function(nCounterPin,GPIO_FUNC_PWM);
-    
+    // Tell the GPIO Pins they are allocated to the PWM
+    gpio_set_function(this->triggerPinNumber,GPIO_FUNC_PWM);
+    gpio_set_function(this->outputPinNumber,GPIO_FUNC_PWM);
+
     pwm_config cfg = pwm_get_default_config();
-    pwm_config_set_clkdiv_mode(&cfg,PWM_DIV_B_FALLING);
+    pwm_config_set_clkdiv_mode(&cfg,PWM_DIV_B_RISING);
     pwm_config_set_clkdiv(&cfg,1);
-    pwm_config_set_wrap(&cfg,counterOverflowValue);
+    pwm_config_set_wrap(&(cfg),10000); // set to value the counter will never reach to prevent overwrap
+    pwm_init(this->nPwmSlice,&cfg,false);
 
-    pwm_init(nPwnSlice,&cfg,false);
-    pwm_set_enabled(nPwnSlice,true);
-
-    // start pwm irq interrupt
-    pwm_set_irq_enabled(nPwnSlice,true);
-    irq_set_exclusive_handler(PWM_IRQ_WRAP,onIrqWrap);
-    irq_set_enabled(PWM_IRQ_WRAP, true);
-
-};
-
-void Impulsecounter::stopCounter(){
-    pwm_set_enabled(nPwnSlice, false);
-
+    pwm_set_chan_level(this->nPwmSlice, PWM_CHAN_A, this->counterCompare); // value
+    pwm_set_counter(this->nPwmSlice,0);
+    pwm_set_enabled(this->nPwmSlice,true);
+    
 };
 
 
 void Impulsecounter::resetCounter(){
-pwm_set_counter(nPwnSlice,0);
+    /*
+        Sets the Value of the Peripheral Counter to 0
+    */
+    pwm_set_counter(this->nPwmSlice,0);
+    //Serial1.println("Counter Reset");
 };
 
-uint16_t Impulsecounter::getCounter(){
-return int(pwm_get_counter(nPwnSlice)/2);
-};
+void Impulsecounter::changeCounterCompare(uint16_t newCounterCompare) {
+    /*
+        Used to set the Peripheral Counters Overflow Value
+    */
+    if(/*(newCounterCompare != this->counterCompare) && */(newCounterCompare >= 0) && (newCounterCompare < 2000)){
+        pwm_set_enabled(this->nPwmSlice,false);
+        this->counterCompare = newCounterCompare;
+        pwm_set_chan_level(this->nPwmSlice, PWM_CHAN_A, newCounterCompare);
+        pwm_set_enabled(this->nPwmSlice,true);
 
-void Impulsecounter::setCounterOverflow(int overflowValue) {
-    counterOverflowValue = (uint16_t) overflowValue * 2;
-    pwm_set_wrap(nPwnSlice,overflowValue);
+   };
 };

@@ -1,3 +1,6 @@
+#include "hardware/pwm.h"
+#include "pico/stdlib.h"
+#include <Arduino.h>
 
 #ifndef DATE_H
 #define DATE_H
@@ -5,14 +8,12 @@
 
 class Impulsecounter{
     private:
-    int nCounterPin;
-    int nPwnSlice;
-    int counterOverflowValue;
+    int triggerPinNumber;
+    int outputPinNumber;
+    int nPwmSlice;
+    int counterCompare;
     public:
-    Impulsecounter(int pinNumber,uint16_t counterOverflowValue);
-    void stopCounter();
+    Impulsecounter(int triggerPinNumber,int outputPinNumber, uint16_t counterCompare);
     void resetCounter();
-    uint16_t getCounter();
-    void setCounterOverflow(int overflowValue);
-    //static void onIrqWrap();
+    void changeCounterCompare(uint16_t newCounterCompare);
 };
