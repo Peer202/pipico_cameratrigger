@@ -65,7 +65,7 @@ void Impulsecounter::changeCounterWrap(uint16_t newWrap) {
         //pwm_set_enabled(this->nPwmSlice,false);
         this->counterWrap = newWrap;
         pwm_set_wrap(this->nPwmSlice, newWrap);
-        p wm_set_chan_level(this->nPwmSlice, PWM_CHAN_A, (uint16_t) (newWrap -1));
+        pwm_set_chan_level(this->nPwmSlice, PWM_CHAN_A, (uint16_t) (newWrap -1));
         //pwm_set_enabled(this->nPwmSlice,true);
 
    };
