@@ -10,9 +10,11 @@ class Impulsecounter{
     int triggerPinNumber;
     int outputPinNumber;
     int nPwmSlice;
+    int counterWrap;
     int counterCompare;
     public:
     Impulsecounter(int triggerPinNumber,int outputPinNumber, uint16_t counterCompare);
     void resetCounter();
     void changeCounterCompare(uint16_t newCounterCompare);
+    void changeCounterWrap(uint16_t newWrap);
 };
