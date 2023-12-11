@@ -17,4 +17,6 @@ class Impulsecounter{
     void resetCounter();
     void changeCounterCompare(uint16_t newCounterCompare);
     void changeCounterWrap(uint16_t newWrap);
+    void skipIncrementsforward(uint16_t incrementsToSkip);
+
 };

@@ -56,7 +56,7 @@ uint slice_num;
 Impulsecounter* stroboCounter;
 
 //uint16_t countercompare = 0;
-uint16_t counterWrap = 1000;
+uint16_t counterWrap = 2000;
 
 void onFullRot(){
   stroboCounter->resetCounter();
@@ -80,7 +80,7 @@ void setup() {
   Serial.begin(115200);
   
   Serial.println("Startup");
-  stroboCounter = new Impulsecounter(KtwoPin,stroboPin,600);
+  stroboCounter = new Impulsecounter(KtwoPin,stroboPin,counterWrap);
 
   //addInterrupt();
 
@@ -88,24 +88,29 @@ void setup() {
 
 void loop() {
   if(Serial.available() > 0){
-    interrupts();
+    //interrupts();
     String command = Serial.readStringUntil('\n');
     if(command == "TEST"){
       Serial.println("CHECK\n");
-    };
-    if(command.startsWith("S")){
-      // Set Commmand
+    } else if(command.startsWith("S")){
+      // Set Increment Commmand
       uint value = command.substring(2).toInt();
       counterWrap = value;
       stroboCounter->changeCounterWrap(counterWrap);
       //Serial1.println(value);
       Serial.println("CHECK\n");
-    };
-    if(command.startsWith("G")){
+    } else if(command.startsWith("G")){
       // Get Command
       Serial.println(counterWrap);
+    } else if(command.startsWith("T")){
+      // Skip Command
+      uint value = command.substring(2).toInt();
+      stroboCounter->skipIncrementsforward(value);
+
+    }else {
+      Serial.println("NOCOM");
     };
-    interrupts();
+    //interrupts();
   };
 }
 
